@@ -1,0 +1,5 @@
+C:\LYAII\U2\SEMANTICA\obj\Debug\net6.0\SEMANTICA.csproj.AssemblyReference.cache
+C:\LYAII\U2\SEMANTICA\obj\Debug\net6.0\SEMANTICA.GeneratedMSBuildEditorConfig.editorconfig
+C:\LYAII\U2\SEMANTICA\obj\Debug\net6.0\SEMANTICA.AssemblyInfoInputs.cache
+C:\LYAII\U2\SEMANTICA\obj\Debug\net6.0\SEMANTICA.AssemblyInfo.cs
+C:\LYAII\U2\SEMANTICA\obj\Debug\net6.0\SEMANTICA.csproj.CoreCompileInputs.cache

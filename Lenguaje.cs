@@ -67,6 +67,19 @@ namespace SEMANTICA
             }
             return 0;
         }
+        private Variable.TipoDato getTipo(string nombreVariable)
+        {
+            //Requerimiento 4.- Obtener el valor de la variable cuando se requiera  y programar el método getValor
+            foreach (Variable v in variables)
+            {
+                if (v.getNombre().Equals(nombreVariable))
+                {
+                    return v.getTipo();
+                }
+            }
+            return 0;
+        }
+
         //Programa  -> Librerias? Variables? Main
         public void Programa()
         {
@@ -194,6 +207,23 @@ namespace SEMANTICA
             {
                 Asignacion();
             }
+        }
+        private Variable.TipoDato EvaluaNumero(float resultado)
+        {
+            if (resultado <= 255)
+            {
+                return Variable.TipoDato.Char;
+            }
+            else if(resultado <= 65535)
+            {
+                return Variable.TipoDato.Int;
+            }
+            return Variable.TipoDato.Char;
+        }
+        private bool EvaluaSemantica(string variable, float resultado)
+        {
+            Variable.TipoDato tipoDato = getTipo(variable);
+            return false;
         }
         //Asignacion -> identificador = cadena | Expresion;
         private void Asignacion()

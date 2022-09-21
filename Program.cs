@@ -9,6 +9,10 @@ namespace SEMANTICA
         {
             try
             {
+                Byte x = 255;
+                Console.WriteLine(x);
+                x++;
+                Console.WriteLine(x);
                 Lenguaje a = new Lenguaje();
 
                 a.Programa();

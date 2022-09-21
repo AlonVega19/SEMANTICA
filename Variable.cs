@@ -1,4 +1,4 @@
-namespace EVALUA
+namespace SEMANTICA
 {
     public class Variable
     {

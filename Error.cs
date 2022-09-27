@@ -5,7 +5,7 @@ namespace SEMANTICA
 {
     public class Error : Exception
     {
-        public Error(string mensaje, StreamWriter log) : base(mensaje)
+        public Error(string mensaje, StreamWriter log)
         {
             Console.WriteLine(mensaje);
             log.WriteLine(mensaje);

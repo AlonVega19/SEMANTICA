@@ -3,3 +3,13 @@ C:\LYAII\U2\SEMANTICA\obj\Debug\net6.0\SEMANTICA.GeneratedMSBuildEditorConfig.ed
 C:\LYAII\U2\SEMANTICA\obj\Debug\net6.0\SEMANTICA.AssemblyInfoInputs.cache
 C:\LYAII\U2\SEMANTICA\obj\Debug\net6.0\SEMANTICA.AssemblyInfo.cs
 C:\LYAII\U2\SEMANTICA\obj\Debug\net6.0\SEMANTICA.csproj.CoreCompileInputs.cache
+C:\LYAII\U2\SEMANTICA\bin\Debug\net6.0\SEMANTICA.exe
+C:\LYAII\U2\SEMANTICA\bin\Debug\net6.0\SEMANTICA.deps.json
+C:\LYAII\U2\SEMANTICA\bin\Debug\net6.0\SEMANTICA.runtimeconfig.json
+C:\LYAII\U2\SEMANTICA\bin\Debug\net6.0\SEMANTICA.dll
+C:\LYAII\U2\SEMANTICA\bin\Debug\net6.0\ref\SEMANTICA.dll
+C:\LYAII\U2\SEMANTICA\bin\Debug\net6.0\SEMANTICA.pdb
+C:\LYAII\U2\SEMANTICA\obj\Debug\net6.0\SEMANTICA.dll
+C:\LYAII\U2\SEMANTICA\obj\Debug\net6.0\ref\SEMANTICA.dll
+C:\LYAII\U2\SEMANTICA\obj\Debug\net6.0\SEMANTICA.pdb
+C:\LYAII\U2\SEMANTICA\obj\Debug\net6.0\SEMANTICA.genruntimeconfig.cache

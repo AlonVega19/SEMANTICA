@@ -6,8 +6,9 @@ using System.Collections.Generic;
 //Requerimiento 3: Programar un metodo de conversion de un valor a un tipo de dato 
 //                 private float convert(float valor, string TipoDato)
 //                 deberan usar el residuo de la division %255, %65535
-//Requerimiento 4: 
-//Requerimiento 5:
+//Requerimiento 4: Evaluar nuevamente la condicion del if, while, for, do while, con respecto al parametro que reciben
+//Requerimiento 5: Levantar una excepcion cuando la captura no sea un numero 
+//Requerimiento 6: Ejecutar el For(); 
 namespace SEMANTICA
 {
     public class Lenguaje : Sintaxis
@@ -145,6 +146,15 @@ namespace SEMANTICA
                 Lista_identificadores(tipo);
             }
         }
+        //Main      -> void main() Bloque de instrucciones
+        private void Main(bool evaluacion)
+        {
+            match("void");
+            match("main");
+            match("(");
+            match(")");
+            BloqueInstrucciones(evaluacion);
+        }
         //Bloque de instrucciones -> {listaIntrucciones?}
         private void BloqueInstrucciones(bool evaluacion)
         {
@@ -259,6 +269,7 @@ namespace SEMANTICA
         {
             match("while");
             match("(");
+            bool validarWhile = Condicion();
             Condicion();
             match(")");
             if (getContenido() == "{") 
@@ -284,6 +295,8 @@ namespace SEMANTICA
             } 
             match("while");
             match("(");
+            //Requerimiento 4 
+            bool validarDo = Condicion();
             Condicion();
             match(")");
             match(";");
@@ -293,19 +306,29 @@ namespace SEMANTICA
         {
             match("for");
             match("(");
-            Asignacion(evaluacion);
-            Condicion();
-            match(";");
-            Incremento(evaluacion);
-            match(")");
-            if (getContenido() == "{")
-            {
-                BloqueInstrucciones(evaluacion);  
-            }
-            else
-            {
-                Instruccion(evaluacion);
-            }
+            //Requerimiento 4
+            //Requerimiento 6
+            //a) Necesito guardar la posición de lectura del archivo de texto
+            bool validarFor = Condicion();
+            //b) Metemos un ciclo while despues de validar el For 
+            //while ()
+            //{
+                Asignacion(evaluacion);
+                Condicion();
+                match(";");
+                Incremento(evaluacion);
+                match(")");
+                if (getContenido() == "{")
+                {
+                    BloqueInstrucciones(evaluacion);  
+                }
+                else
+                {
+                    Instruccion(evaluacion);
+                }
+            //c) Regresar a la posicion de lectura del archivo
+            //d) Sacar otro token 
+            //}
         }
         //Incremento -> Identificador ++ | --
         private void Incremento(bool evaluacion)
@@ -419,6 +442,8 @@ namespace SEMANTICA
         {
             match("if");
             match("(");
+            //Requerimiento 4
+
             bool validarif = Condicion();
             match(")");
             if (getContenido() == "{")
@@ -485,21 +510,15 @@ namespace SEMANTICA
             }
             //Requerimiento 2.- Si no existe la variable levanta la excepcion
             string val= "" + Console.ReadLine();
+            float valorFloat = float.Parse(val);
+          //  modificaValor (nombreVariable, valorFloat);
             //Requerimiento 5._ MOdificar el valor de la variable
             modificaValor(getContenido(), float.Parse(val));
             match(Tipos.Identificador);
             match(")");
             match(";");
         }
-        //Main      -> void main() Bloque de instrucciones
-        private void Main(bool evaluacion)
-        {
-            match("void");
-            match("main");
-            match("(");
-            match(")");
-            BloqueInstrucciones(evaluacion);
-        }
+        
         //Expresion -> Termino MasTermino
         private void Expresion()
         {

@@ -9,12 +9,16 @@ namespace SEMANTICA
         {
             try
             {
+                Byte x = 255;
+                Console.WriteLine(x);
+                x++;
+                Console.WriteLine(x);
                 Lenguaje a = new Lenguaje();
 
                 a.Programa();
 
 
-                
+
                 /*a.match("#");
                 a.match("include");
                 a.match("<");
@@ -22,16 +26,16 @@ namespace SEMANTICA
                 a.match(".");
                 a.match("h");
                 a.match(">"); */
-                
+
                 //while(!a.FinArchivo())
                 //{
-                  //  a.NextToken();
+                //  a.NextToken();
                 //}
                 a.cerrar();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                
+                Console.WriteLine(e.Message);
             }
         }
     }

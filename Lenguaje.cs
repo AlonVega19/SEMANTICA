@@ -29,7 +29,6 @@ namespace SEMANTICA
         {
             variables.Add(new Variable(nombre, tipo));
         }
-
         private void displayVariables()
         {   
             log.WriteLine();
@@ -60,6 +59,22 @@ namespace SEMANTICA
                 }
             }
         }
+        private float convert(float valor, Variable.TipoDato tipo)
+        {
+            if(dominante == Variable.TipoDato.Char && valor > 255)
+            {
+                valor = valor%256;
+                return valor;
+            } else if(dominante == Variable.TipoDato.Int && valor > 65535)
+            {
+                valor = valor%65536;
+                return valor;
+            }
+            else
+            {
+                return valor;
+            }
+        }
         private float getValor(string nombreVariable)
         {
             //Requerimiento 4.- Obtener el valor de la variable cuando se requiera  y programar el método getValor
@@ -84,11 +99,11 @@ namespace SEMANTICA
             return Variable.TipoDato.Char;
         }
         //Programa  -> Librerias? Variables? Main
-        public void Programa(bool evaluacion)
+        public void Programa()
         {
             Libreria();
             Variables();
-            Main(evaluacion);
+            Main();
             displayVariables();
         }
         //Librerias -> #include<identificador(.h)?> Librerias?
@@ -137,7 +152,7 @@ namespace SEMANTICA
                 }
                 else
                 {
-                    throw new Error("Error, se duplico la variable " +getContenido()+" en la linea: "+linea, log);
+                    throw new Error("Error, variable duplicada" +getContenido()+" en la linea: "+linea, log);
                 }
             }
             match(Tipos.Identificador);
@@ -148,13 +163,13 @@ namespace SEMANTICA
             }
         }
         //Main      -> void main() Bloque de instrucciones
-        private void Main(bool evaluacion)
+        private void Main()
         {
             match("void");
             match("main");
             match("(");
             match(")");
-            BloqueInstrucciones(evaluacion);
+            BloqueInstrucciones(true);
         }
         //Bloque de instrucciones -> {listaIntrucciones?}
         private void BloqueInstrucciones(bool evaluacion)
@@ -235,7 +250,7 @@ namespace SEMANTICA
             {
                 if(!existeVariable(getContenido()))
                 {
-                    throw new Error("Error de sintais, variable no existe: <"+ getContenido() + "> es inexistente en linea:"+ linea, log);
+                    throw new Error("Error de sintais, la variable no existe: <"+ getContenido() + "> es inexistente en linea:"+ linea, log);
                 }
             }
             log.WriteLine();
@@ -271,65 +286,93 @@ namespace SEMANTICA
             match("while");
             match("(");
             bool validarWhile = Condicion();
-            Condicion();
-            match(")");
-            if (getContenido() == "{") 
+            //Requerimiento 4
+            if(!evaluacion)
             {
-                BloqueInstrucciones(evaluacion);
+                validarWhile = false;
+            }
+            match(")");
+            if(getContenido() == "{") 
+            {
+                BloqueInstrucciones(validarWhile);
             }
             else
             {
-                Instruccion(evaluacion);
+                Instruccion(validarWhile);
             }
         }
         //Do -> do bloque de instrucciones | intruccion while(Condicion)
         private void Do(bool evaluacion)
         {
+            bool validarDo = evaluacion;
             match("do");
-            if (getContenido() == "{")
+            if(getContenido() == "{")
             {
-                BloqueInstrucciones(evaluacion);
+                BloqueInstrucciones(validarDo);
             }
             else
             {
-                Instruccion(evaluacion);
+                Instruccion(validarDo);
             } 
             match("while");
             match("(");
-            //Requerimiento 4 
-            bool validarDo = Condicion();
-            Condicion();
+            //Requerimiento 4
+            validarDo = Condicion();
+            if(!evaluacion)
+            {
+                validarDo = false;
+            }
             match(")");
             match(";");
+        }
+
+        public void setPosicion(long posicion)
+        {
+            archivo.DiscardBufferedData();
+            archivo.BaseStream.Seek(posicion, SeekOrigin.Begin);
         }
         //For -> for(Asignacion Condicion; Incremento) BloqueInstruccones | Intruccion 
         private void For(bool evaluacion)
         {
             match("for");
             match("(");
-            //Requerimiento 4
-            //Requerimiento 6
-            //a) Necesito guardar la posición de lectura del archivo de texto
-            bool validarFor = Condicion();
-            //b) Metemos un ciclo while despues de validar el For 
-            //while ()
-            //{
-                Asignacion(evaluacion);
-                Condicion();
-                match(";");
-                Incremento(evaluacion);
-                match(")");
-                if (getContenido() == "{")
+            Asignacion(evaluacion);
+            //Requerimiento 4:
+            //Requerimiento 6:
+            //                  a)Necesito guardar la posicion del archivo de texto
+            string variable = getContenido();
+            bool validarFor;
+            int pos = posicion;
+            int lin = linea;
+            //                  b)Agregar un ciclo while
+            do
+            {
+                validarFor = Condicion();
+                if(!evaluacion)
                 {
-                    BloqueInstrucciones(evaluacion);  
+                    validarFor = false;
+                }
+                match(";");
+                Incremento(validarFor);
+                match(")");
+                if(getContenido() == "{")
+                {
+                    BloqueInstrucciones(validarFor);  
                 }
                 else
                 {
-                    Instruccion(evaluacion);
+                    Instruccion(validarFor);
                 }
-            //c) Regresar a la posicion de lectura del archivo
-            //d) Sacar otro token 
-            //}
+                if(validarFor)
+                {
+                    posicion = pos - variable.Length;
+                    linea = lin;
+                    setPosicion(posicion);
+                    NextToken();
+                }
+                //              c)Regresar a la posicion de lectura del archivo
+                //              d)Sacar otro token
+            }while(validarFor);
         }
         //Incremento -> Identificador ++ | --
         private void Incremento(bool evaluacion)
@@ -444,27 +487,45 @@ namespace SEMANTICA
             match("if");
             match("(");
             //Requerimiento 4
-
-            bool validarif = Condicion();
-            match(")");
-            if (getContenido() == "{")
+            bool validarIf = Condicion();
+            if(!evaluacion)
             {
-                BloqueInstrucciones(validarif);  
+                validarIf = false;
+            }
+            match(")");
+            if(getContenido() == "{")
+            {
+                BloqueInstrucciones(validarIf);          
             }
             else
             {
-                Instruccion(validarif);
+                Instruccion(validarIf);  
             }
-            if (getContenido() == "else")
+            if(getContenido() == "else")
             {
                 match("else");
-                if (getContenido() == "{")
+                //Requerimiento 4 Se debe comportar alravez
+                if(getContenido() == "{")
                 {
-                    BloqueInstrucciones(validarif);
+                    if(evaluacion)
+                    {
+                        BloqueInstrucciones(!validarIf);
+                    }
+                    else
+                    {
+                        BloqueInstrucciones(evaluacion);
+                    }
                 }
                 else
                 {
-                    Instruccion(validarif);
+                    if(evaluacion)
+                    {
+                        Instruccion(!validarIf);
+                    }
+                    else
+                    {
+                        Instruccion(evaluacion);
+                    }
                 }
             }
         }
@@ -491,7 +552,7 @@ namespace SEMANTICA
                 float resultado = stack.Pop();
                 if (evaluacion)
                 {
-                Console.Write(stack.Pop());
+                    Console.Write(resultado);
                 }
             }
             match(")");
@@ -509,12 +570,20 @@ namespace SEMANTICA
             {
                 throw new Error("Error de sintais, variable solicitada: <"+ getContenido() + "> es inexistente en linea:"+ linea, log);
             }
-            //Requerimiento 2.- Si no existe la variable levanta la excepcion
-            string val= "" + Console.ReadLine();
-            float valorFloat = float.Parse(val);
-          //  modificaValor (nombreVariable, valorFloat);
-            //Requerimiento 5._ MOdificar el valor de la variable
-            modificaValor(getContenido(), float.Parse(val));
+            if(evaluacion)
+            {   
+                //Requerimiento 2.- Si no existe la variable levanta la excepcion
+                string val = ""+Console.ReadLine(); 
+                //modificaValor (nombreVariable, valorFloat);
+                //Requerimiento 5._ MOdificar el valor de la variable
+                double validaVal;
+                if(!double.TryParse(val, out validaVal))
+                {
+                    throw new Error("Error de sintaxis, se espera un numero en linea: "+linea, log);
+                }
+                float valorFloat = float.Parse(val);
+                modificaValor(getContenido(), valorFloat);
+            }         
             match(Tipos.Identificador);
             match(")");
             match(";");
@@ -598,10 +667,10 @@ namespace SEMANTICA
                 }
                 log.Write(getContenido() + " ");
                 //Requerimiento 1 : Es con un if como ese
-                /*if(dominante < evaluanumero(float.Parse(getContenido())))
+                if(dominante < getTipo(getContenido()))
                 {
-                    dominante = evaluanumero(float.Parse(getContenido()));
-                }*/
+                    dominante = getTipo(getContenido());
+                }
                 stack.Push(getValor(getContenido()));
                 match(Tipos.Identificador);
             }
@@ -639,7 +708,14 @@ namespace SEMANTICA
                     //Requerimiento 3:
                     //Ejemplo: si el casteo es char y el Pop regresa un 256
                     //el valor equivalente en casteo es 0
-
+                    dominante = casteo;
+                    float valor = stack.Pop();
+                    if(valor%1 !=0 && dominante != Variable.TipoDato.Float)
+                    {
+                        valor = MathF.Truncate(valor);
+                    }
+                    valor = convert(valor, dominante);
+                    stack.Push(valor);
                 }
             }
         }

@@ -1,0 +1,3 @@
+modificaValor=modVariable
+evaluasemantica=evaluaSemantica
+nombreVariable=nombre

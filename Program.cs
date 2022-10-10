@@ -1,4 +1,5 @@
-﻿using System;
+﻿//Alondra Yocelin Osornio Vega
+using System;
 using System.IO;
 
 namespace SEMANTICA

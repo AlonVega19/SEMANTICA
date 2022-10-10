@@ -1,5 +1,5 @@
+//Alondra Yocelin Osornio Vega
 using System;
-
 namespace SEMANTICA
 {
     public class Sintaxis : Lexico

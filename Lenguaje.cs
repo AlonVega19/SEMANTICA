@@ -1,3 +1,4 @@
+//Alondra Yocelin Osornio Vega
 using System;
 using System.Collections.Generic;
 //Requerimiento 1: Actualizar el dominante para variables en la expersion.

@@ -1,5 +1,5 @@
+//Alondra Yocelin Osornio Vega
 using System.IO;
-
 namespace SEMANTICA
 {
     public class Lexico : Token

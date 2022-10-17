@@ -340,20 +340,22 @@ namespace SEMANTICA
             //Requerimiento 4:
             //Requerimiento 6:
             //                  a)Necesito guardar la posicion del archivo de texto
-            string variable = getContenido();
+            string variable= "";
             bool validarFor;
             int pos = posicion;
             int lin = linea;
             //                  b)Agregar un ciclo while
             do
             {
+                
                 validarFor = Condicion();
                 if(!evaluacion)
                 {
                     validarFor = false;
                 }
                 match(";");
-                Incremento(validarFor);
+                variable = getContenido();
+                float valor = Incremento1(validarFor);
                 match(")");
                 if(getContenido() == "{")
                 {
@@ -372,7 +374,9 @@ namespace SEMANTICA
                 }
                 //              c)Regresar a la posicion de lectura del archivo
                 //              d)Sacar otro token
+                modificaValor(variable, valor);
             }while(validarFor);
+            
         }
         //Incremento -> Identificador ++ | --
         private void Incremento(bool evaluacion)
@@ -407,6 +411,40 @@ namespace SEMANTICA
             {
                 match(Tipos.IncrementoTermino);
             }
+        }
+        private float Incremento1(bool evaluacion)
+        {
+            string variable = getContenido();
+            //Requerimiento 2.- Si no existe la variable levanta la excepcion
+            if(!existeVariable(getContenido()))
+            {
+                throw new Error("Error de sintais, variable no existe: <"+ getContenido() + "> es inexistente en linea:"+ linea, log);
+            }
+            match(Tipos.Identificador);
+            if (getClasificacion() == Tipos.IncrementoTermino)
+            {
+                if (getContenido()[0] == '+')
+                {
+                    match("++");
+                    if (evaluacion)
+                    {
+                        return getValor(variable) + 1;
+                    }
+                }
+                else
+                {
+                    match("--");
+                    if (evaluacion)
+                    {
+                       return getValor(variable) - 1;
+                    }
+                }
+            }
+            else
+            {
+                match(Tipos.IncrementoTermino);
+            }
+            return 0;
         }
         //Switch -> switch (Expresion) {Lista de casos} | (default: )
         private void Switch(bool evaluacion)

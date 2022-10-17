@@ -9,6 +9,7 @@ namespace SEMANTICA
         const int F = -1;
         const int E = -2;
         protected int linea;
+        protected int posicion;
         int[,] TRAND = new int[,]
         {
             //WS,EF,EL,L, D, .,	E, +, -, =,	:, ;, &, |,	!, >, <, *,	%, /, ", ?,La, ', #
@@ -282,6 +283,8 @@ namespace SEMANTICA
                 if (estado >= 0)
                 {
                     archivo.Read();
+                    posicion++;
+
                     if(c == '\n')
                     {
                         linea++;

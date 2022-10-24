@@ -30,7 +30,6 @@ namespace SEMANTICA
                 //{
                 //  a.NextToken();
                 //}
-                a.cerrar();
             }
             catch (Exception e)
             {

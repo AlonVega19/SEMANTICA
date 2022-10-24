@@ -16,14 +16,14 @@ using System.Collections.Generic;
 //Requerimiento 3:
 //                 a)Considerar las variables y los casteos de las expresiones matematicas en ensamblador    
 
-namespace Semantica
+namespace SEMANTICA
 {
     public class Lenguaje : Sintaxis
     {
         List <Variable> variables = new List<Variable>();
         Stack<float> stack = new Stack<float>();
         Variable.TipoDato dominante;
-
+        int cIf;
         public Lenguaje()
         {
 
@@ -52,6 +52,13 @@ namespace Semantica
             {
                 log.WriteLine(v.getNombre()+" "+v.getTipo()+" "+v.getValor());
             }
+        }
+        private void variablesAsm(){
+            asm.WriteLine("Variables: ");
+            foreach(Variable v in variables){
+                asm.WriteLine("\t" + v.getNombre()+" DW ? ");
+            }
+
         }
 
         private bool existeVariable(string nombre)
@@ -126,11 +133,11 @@ namespace Semantica
             asm.WriteLine("ORG 100h");
             Libreria();
             Variables();
+            variablesAsm();
             Main();
             displayVariables();
             asm.WriteLine("RET");
             asm.WriteLine("END");
-            asm.WriteLine("Pop AX");
         }
 
         //Librerias -> #include<identificador(.h)?> Librerias?
@@ -531,6 +538,7 @@ namespace Semantica
         //If -> if(Condicion) bloque de instrucciones (else bloque de instrucciones)?
         private void If(bool evaluacion)
         {
+            String etiquetaIf = "if" + ++cIf;
             match("if");
             match("(");
             //Requerimiento 4
@@ -575,6 +583,7 @@ namespace Semantica
                     }
                 }
             }
+            asm.WriteLine(etiquetaIf+":");
         }
 
         //Printf -> printf(cadena o expresion);

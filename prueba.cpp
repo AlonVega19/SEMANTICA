@@ -8,16 +8,34 @@ float x;
 char y;int i ;int j;
 // Este programa calcula el volumen de un cilindro.
 void main(){
+    
+    y = 61;
+    if(y==61)
+    {
+        x=0;
+        if(i==5)
+        {
+            i=0;
+        }
+        x=10;
+
+    }
+    /*
+    y = 255;
+    y++;
+    y+=2;
     //Requerimiento 5.- Levanta una excepcion en el scanf si la captura no es un numero
     printf("Introduce la altura de la piramide: ");
     scanf("altura", &altura);
     //Requerimiento 6.- Ejecutar el for y for anidado
-    if(altura >2)
-        for(i = altura; i > 0; i--)
+    if(altura >4)
+        for(i = altura; i > 0; i-=2)
         {
-        
-            for(j = 0; j < altura-i; j+=){
-                if(j!=2){
+            j = 0;
+            while(j < altura-i)
+            {
+                j+=1;
+                if(j%2 == 0){
                     printf("*");
                 }
                 else{
@@ -41,6 +59,5 @@ void main(){
     printf("\nValor de variable char y despues del casteo de a: ");
     printf(y);
     printf("\nA continuacion se intenta asignar un int a un char sin usar casteo: \n");
-    y = a; //Requerimiento 1.- debe marcar error
-    
+    y = a; //Requerimiento 1.- debe marcar error*/
 }

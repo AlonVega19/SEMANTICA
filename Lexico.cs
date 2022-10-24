@@ -1,7 +1,7 @@
 //Alondra Yocelin Osornio Vega
 using System.IO;
 
-namespace EMANTICA
+namespace SEMANTICA
 {
     public class Lexico : Token
     {
@@ -61,11 +61,11 @@ namespace EMANTICA
         public Lexico()
         {
             linea = 1;
-            string path = "C:\\Users\\Axrro\\OneDrive\\Documentos\\Escuela\\Tareas\\Lenguajes y Automatas II\\Repositorio\\Proyecto-2\\prueba.cpp";
+            string path = "C:\\LYAII\\U2\\SEMANTICA\\prueba.cpp";
             bool existencia = File.Exists(path);
-            log = new StreamWriter("C:\\Users\\Axrro\\OneDrive\\Documentos\\Escuela\\Tareas\\Lenguajes y Automatas II\\Repositorio\\Proyecto-2\\prueba.Log"); 
+            log = new StreamWriter("C:\\LYAII\\U2\\SEMANTICA\\prueba.Log"); 
             log.AutoFlush = true;
-            asm = new StreamWriter("C:\\Users\\Axrro\\OneDrive\\Documentos\\Escuela\\Tareas\\Lenguajes y Automatas II\\Repositorio\\Proyecto-2\\Prueba.asm");
+            asm= new StreamWriter("C:\\LYAII\\U2\\SEMANTICA\\prueba.asm");
             asm.AutoFlush = true;
             //log.WriteLine("Primer constructor");
             log.WriteLine("Archivo: prueba.cpp");

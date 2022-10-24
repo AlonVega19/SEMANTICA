@@ -1,7 +1,23 @@
 Archivo: prueba.cpp
-Fecha 21/10/2022 09:20:29 a. m.
-altura 2 
-i = altura = 5
-i 0 
-j = 0 = 0
-j altura i - Error de sintaxis, se espera un -- en linea: 19
+Fecha 24/10/2022 09:48:19 a. m.
+
+y = 61 = 61
+y 61 
+x = 0 = 0
+i 5 
+i = 0 = 0
+
+x = 10 = 10
+
+Variables: 
+area Float 0
+radio Float 0
+pi Float 0
+resultado Float 0
+a Int 0
+d Int 0
+altura Int 0
+x Float 10
+y Char 61
+i Int 0
+j Int 0

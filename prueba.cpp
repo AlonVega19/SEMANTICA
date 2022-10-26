@@ -8,12 +8,17 @@ float x;
 char y;int i ;int j;
 // Este programa calcula el volumen de un cilindro.
 void main(){
-    
-    y = 61;
-    if(y==61)
+    if(1==1)
     {
-        x=10;
-
+        if(2==2)
+        {
+            y=2;
+            if(3==3)
+            {
+                a=3;
+            }
+        }
+        x=1;
     }
     /*
     y = 255;

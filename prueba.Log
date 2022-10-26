@@ -1,19 +1,21 @@
 Archivo: prueba.cpp
-Fecha 25/10/2022 09:55:35 a. m.
+Fecha 26/10/2022 09:31:51 a. m.
+1 1 2 2 
+y = 2 = 2
+3 3 
+a = 3 = 3
 
-y = 61 = 61
-y 61 
-x = 10 = 10
+x = 1 = 1
 
 Variables: 
 area Float 0
 radio Float 0
 pi Float 0
 resultado Float 0
-a Int 0
+a Int 3
 d Int 0
 altura Int 0
-x Float 10
-y Char 61
+x Float 1
+y Char 2
 i Int 0
 j Int 0

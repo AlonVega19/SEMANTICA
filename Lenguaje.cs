@@ -340,6 +340,7 @@ namespace SEMANTICA
                 {
                     throw new Error("Error de semantica, no podemos asignar un <" + dominante + "> a un <" + getTipo(nombre) + "> en la linea " + linea, log);
                 }
+                asm.WriteLine("MOV " + nombre + ",AX");
             }
         }
 
@@ -348,7 +349,7 @@ namespace SEMANTICA
         {
             match("while");
             match("(");
-            bool validarWhile = Condicion();
+            bool validarWhile = Condicion("");
             //Requerimiento 4
             if(!evaluacion)
             {
@@ -381,7 +382,7 @@ namespace SEMANTICA
             match("while");
             match("(");
             //Requerimiento 4
-            validarDo = Condicion();
+            validarDo = Condicion("");
             if(!evaluacion)
             {
                 validarDo = false;
@@ -408,7 +409,7 @@ namespace SEMANTICA
             int lin = linea;
             do
             {
-                validarFor = Condicion();
+                validarFor = Condicion("");
                 if(!evaluacion)
                 {
                     validarFor = false;
@@ -508,7 +509,7 @@ namespace SEMANTICA
         }
 
         //Condicion -> Expresion operador relacional Expresion
-        private bool Condicion()
+        private bool Condicion(string etiqueta)
         {
             Expresion();
             String operador = getContenido();
@@ -521,16 +522,22 @@ namespace SEMANTICA
             switch(operador)
             {
                 case "==":
+                    asm.WriteLine("JNE" + etiqueta);
                     return e1 == e2;
                 case "<":
+                    asm.WriteLine("JGE" + etiqueta);
                     return e1 < e2;
                 case "<=":
+                    asm.WriteLine("JG" + etiqueta);
                     return e1 <= e2;
                 case ">":
+                    asm.WriteLine("JLE" + etiqueta);
                     return e1 > e2;
                 case ">=":
+                    asm.WriteLine("JL" + etiqueta);
                     return e1 >= e2;
                 default:
+                    asm.WriteLine("JE" + etiqueta);
                     return e1 != e2;
             }
         }
@@ -542,7 +549,7 @@ namespace SEMANTICA
             match("if");
             match("(");
             //Requerimiento 4
-            bool validarIf = Condicion();
+            bool validarIf = Condicion("");
             if(!evaluacion)
             {
                 validarIf = false;
@@ -672,6 +679,7 @@ namespace SEMANTICA
                 asm.WriteLine("Pop AX");
                 float n2=stack.Pop();
                 asm.WriteLine("Pop BX");
+                asm.WriteLine("CMP AX, BX");
                 switch(operador)
                 {
                     case "+":
@@ -749,6 +757,7 @@ namespace SEMANTICA
                     dominante = getTipo(getContenido());
                 }
                 stack.Push(getValor(getContenido()));
+                //Requerimiento 3.a
                 match(Tipos.Identificador);
             }
             else

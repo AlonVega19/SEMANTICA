@@ -32,13 +32,16 @@ namespace SEMANTICA
         Stack<float> stack = new Stack<float>();
         Variable.TipoDato dominante;
         int cIf;
+        int cFor;
         public Lenguaje()
         {
             cIf = 0;
+            cIf = cFor = 0;
         }
         public Lenguaje(string nombre) : base(nombre)
         {
             cIf = 0;
+            cIf = cFor = 0;
         }
 
         ~Lenguaje()
@@ -135,8 +138,8 @@ namespace SEMANTICA
 
         //Programa  -> Librerias? Variables? Main
         public void Programa()
-        {
-            asm.WriteLine("make COM");
+        { 
+            asm.WriteLine("#make COM");
             asm.WriteLine("include 'emu 8086.inc'");
             asm.WriteLine("ORG 100h");
             Libreria();
@@ -145,7 +148,7 @@ namespace SEMANTICA
             Main();
             displayVariables();
             asm.WriteLine("RET");
-            asm.WriteLine("END");
+            asm.WriteLine("DEFINE_SCAN_NUM");
         }
 
         //Librerias -> #include<identificador(.h)?> Librerias?
@@ -323,6 +326,43 @@ namespace SEMANTICA
             if(getClasificacion() == Tipos.IncrementoTermino || getClasificacion() == Tipos.IncrementoFactor)
             {
                 //Requerimiento 1.b
+                float resultado = getValor(nombre);
+                switch(getContenido())
+                {
+                    case "++":
+                        match(Tipos.IncrementoTermino);
+                        match(";");
+                        resultado++;
+                        break;
+                    case "--":
+                        match(Tipos.IncrementoTermino);
+                        match(";");
+                        resultado--;
+                        break;
+                    case "+=":
+                        match(Tipos.IncrementoFactor);
+                        ;
+                        break;
+                }
+                asm.WriteLine("Pop AX");
+                log.Write("= " + resultado);
+                log.WriteLine();
+                if(dominante < evaluaNumero(resultado))
+                {
+                    dominante = evaluaNumero(resultado);
+                }
+                if(dominante <= getTipo(nombre))
+                {
+                    if(evaluacion)
+                    {
+                        modVariable(nombre, resultado);
+                    }
+                }
+                else
+                {
+                    throw new Error("Error de semantica, no podemos asignar un <" + dominante + "> a un <" + getTipo(nombre) + "> en la linea " + linea, log);
+                }
+                asm.WriteLine("Mov " + nombre + ", AX");
             }
             else
             {
@@ -408,6 +448,9 @@ namespace SEMANTICA
         //For -> for(Asignacion Condicion; Incremento) BloqueInstruccones | Intruccion 
         private void For(bool evaluacion)
         {
+            string etiquetaInicioFor = "inicioFor" + cFor;
+            string etiquetaFinFor = "finFor" + cFor++;
+            asm.WriteLine(etiquetaInicioFor + ":");
             match("for");
             match("(");
             Asignacion(evaluacion);
@@ -442,6 +485,7 @@ namespace SEMANTICA
                     NextToken();
                 }
             }while(validarFor);
+            asm.WriteLine(etiquetaFinFor + ":");
         }
 
         //Incremento -> Identificador ++ | --
@@ -622,6 +666,7 @@ namespace SEMANTICA
                         Console.Write(cadena[i]);
                     }
                 }
+                asm.WriteLine("PRINTN " + getContenido());
                 match(Tipos.Cadena);
             }
             else
@@ -662,6 +707,8 @@ namespace SEMANTICA
                 float valorFloat = float.Parse(val);
                 modVariable(getContenido(), valorFloat);
             }         
+            asm.WriteLine("CALL SCAN_NUM");
+            asm.WriteLine("MOV " + getContenido() + ", CX"); 
             match(Tipos.Identificador);
             match(")");
             match(";");

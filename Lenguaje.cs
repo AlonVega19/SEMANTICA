@@ -2,21 +2,21 @@
 using System;
 using System.Collections.Generic;
 //Requerimiento 1: Actualizacion:
-//                 a)agregar el residuo de la division en porfactor <3
+//                 a)agregar el residuo de la division en porfactor       <3
 //                 b)agregar en instruccion los incrementos de termino y los incrementos de factor
 //                   a++, a--, a+=1, a-=1, a*=1, a/=1, a%=1
-//                   en donde el uno puede ser una expresion
+//                   en donde el uno puede ser una expresion              <3
 //                 c)programar el destructor para ejecutar el metodo cerrarArchivo()
 //                  #libreria especial
 //Requerimiento 2:    
 //                 a)Marcar errores semanticos cuando los incrementos de termino o incrementos de factor
-//                   superen el rango de la variable
+//                   superen el rango de la variable                      <3
 //                 b)Considerar el inciso b y c para el for
-//                 c)Que funcione el do y el while
+//                 c)Que funcione el do y el while                        <3
 //Requerimiento 3:
 //                 a)Considerar las variables y los casteos de las expresiones matematicas en ensamblador 
-//                 b)Considerar el residuo de la division en assembler  <3    
-//                 c)Programar el printf y scanf en ensamblador <3
+//                 b)Considerar el residuo de la division en assembler    <3    
+//                 c)Programar el printf y scanf en ensamblador           <3
 //Requerimiento 4: 
 //                 a) Programar el else en ensamblador
 //                 b) Programar el for en ensamblador
@@ -140,7 +140,7 @@ namespace SEMANTICA
         public void Programa()
         { 
             asm.WriteLine("#make COM");
-            asm.WriteLine("include 'emu 8086.inc'");
+            asm.WriteLine("include 'emu8086.inc'");
             asm.WriteLine("ORG 100h");
             Libreria();
             Variables();
@@ -217,74 +217,74 @@ namespace SEMANTICA
             match("main");
             match("(");
             match(")");
-            BloqueInstrucciones(true);
+            BloqueInstrucciones(true, true);
         }
 
         //Bloque de instrucciones -> {listaIntrucciones?}
-        private void BloqueInstrucciones(bool evaluacion)
+        private void BloqueInstrucciones(bool evaluacion, bool evaluaAsm)
         {
             match("{");
             if(getContenido() != "}")
             {
-                ListaInstrucciones(evaluacion);
+                ListaInstrucciones(evaluacion, evaluaAsm);
             }    
             match("}"); 
         }
 
         //ListaInstrucciones -> Instruccion ListaInstrucciones?
-        private void ListaInstrucciones(bool evaluacion)
+        private void ListaInstrucciones(bool evaluacion, bool evaluaAsm)
         {
-            Instruccion(evaluacion);
+            Instruccion(evaluacion, evaluaAsm);;
             if(getContenido() != "}")
             {
-                ListaInstrucciones(evaluacion);
+                ListaInstrucciones(evaluacion, evaluaAsm);
             }
         }
 
         //ListaInstruccionesCase -> Instruccion ListaInstruccionesCase?
-        private void ListaInstruccionesCase(bool evaluacion)
+        private void ListaInstruccionesCase(bool evaluacion, bool evaluaAsm)
         {
-            Instruccion(evaluacion);
+            Instruccion(evaluacion, evaluaAsm);
             if(getContenido() != "case" && getContenido() !=  "break" && getContenido() != "default" && getContenido() != "}")
             {
-                ListaInstruccionesCase(evaluacion);
+                ListaInstruccionesCase(evaluacion, evaluaAsm);
             }
         }
 
         //Instruccion -> Printf | Scanf | If | While | do while | For | Switch | Asignacion
-        private void Instruccion(bool evaluacion)
+        private void Instruccion(bool evaluacion, bool evaluaAsm)
         {
             if(getContenido() == "printf")
             {
-                Printf(evaluacion);
+                Printf(evaluacion, evaluaAsm);
             }
             else if(getContenido() == "scanf")
             {
-                Scanf(evaluacion);
+                Scanf(evaluacion, evaluaAsm);
             }
             else if(getContenido() == "if")
             {
-                If(evaluacion);
+                If(evaluacion, evaluaAsm);
             }
             else if(getContenido() == "while")
             {
-                While(evaluacion);
+                While(evaluacion, evaluaAsm);
             }
             else if(getContenido() == "do")
             {
-                Do(evaluacion);
+                Do(evaluacion, evaluaAsm);
             }
             else if(getContenido() == "for")
             {
-                For(evaluacion);
+                For(evaluacion, evaluaAsm);
             }
             else if(getContenido() == "switch")
             {
-                Switch(evaluacion);
+                Switch(evaluacion, evaluaAsm);
             }
             else
             {
-                Asignacion(evaluacion);
+                Asignacion(evaluacion, evaluaAsm);
             }
         }
 
@@ -312,7 +312,7 @@ namespace SEMANTICA
         }
 
         //Asignacion -> identificador = cadena | Expresion;
-        private void Asignacion(bool evaluacion)
+        private void Asignacion(bool evaluacion, bool evaluaAsm)
         {
             if(!existeVariable(getContenido()))
             {
@@ -327,23 +327,7 @@ namespace SEMANTICA
             {
                 //Requerimiento 1.b
                 float resultado = getValor(nombre);
-                switch(getContenido())
-                {
-                    case "++":
-                        match(Tipos.IncrementoTermino);
-                        match(";");
-                        resultado++;
-                        break;
-                    case "--":
-                        match(Tipos.IncrementoTermino);
-                        match(";");
-                        resultado--;
-                        break;
-                    case "+=":
-                        match(Tipos.IncrementoFactor);
-                        ;
-                        break;
-                }
+                match(";");
                 asm.WriteLine("Pop AX");
                 log.Write("= " + resultado);
                 log.WriteLine();
@@ -362,7 +346,10 @@ namespace SEMANTICA
                 {
                     throw new Error("Error de semantica, no podemos asignar un <" + dominante + "> a un <" + getTipo(nombre) + "> en la linea " + linea, log);
                 }
-                asm.WriteLine("Mov " + nombre + ", AX");
+                if(evaluaAsm)
+                {
+                    asm.WriteLine("Mov " + nombre + ", AX");
+                }
             }
             else
             {
@@ -370,7 +357,10 @@ namespace SEMANTICA
                 Expresion();
                 match(";");
                 float resultado = stack.Pop();
-                asm.WriteLine("Pop AX");
+                if(evaluaAsm)
+                {
+                    asm.WriteLine("Pop AX");
+                }
                 log.Write("= "+resultado);
                 log.WriteLine();
                 if(dominante < evaluaNumero(resultado))
@@ -388,55 +378,88 @@ namespace SEMANTICA
                 {
                     throw new Error("Error de semantica, no podemos asignar un <" + dominante + "> a un <" + getTipo(nombre) + "> en la linea " + linea, log);
                 }
-                asm.WriteLine("MOV " + nombre + ",AX");
+                if(evaluaAsm)
+                {
+                    asm.WriteLine("Mov " + nombre + ", AX");
+                }
             }
         }
 
         //While -> while(Condicion) bloque de instrucciones | instruccion
-        private void While(bool evaluacion)
+        private void While(bool evaluacion, bool evaluaAsm)
         {
             match("while");
             match("(");
-            bool validarWhile = Condicion("");
-            //Requerimiento 4
-            if(!evaluacion)
+            string variable = getContenido();
+            if(!existeVariable(getContenido()))
+                throw new Error("Error de sintaxis, variable inexistente <" +getContenido()+"> en linea: "+linea, log);
+            bool validarWhile;
+            int pos = posicion;
+            int lin = linea;
+            do
             {
-                validarWhile = false;
-            }
-            match(")");
-            if(getContenido() == "{") 
-            {
-                BloqueInstrucciones(validarWhile);
-            }
-            else
-            {
-                Instruccion(validarWhile);
-            }
+                 validarWhile = Condicion("");            
+                if(!evaluacion)
+                {
+                    validarWhile = false;
+                }
+                match(")");
+                if(getContenido() == "{") 
+                {
+                    BloqueInstrucciones(validarWhile, evaluaAsm);
+                }
+                else
+                {
+                    Instruccion(validarWhile, evaluaAsm);
+                }
+                if(validarWhile)
+                {
+                    posicion = pos - variable.Length;
+                    linea = lin;
+                    setPosicion(posicion);
+                    NextToken();
+                }
+            }while(validarWhile);
         }
 
         //Do -> do bloque de instrucciones | intruccion while(Condicion)
-        private void Do(bool evaluacion)
+        private void Do(bool evaluacion, bool evaluaAsm)
         {
-            bool validarDo = evaluacion;
             match("do");
-            if(getContenido() == "{")
+            
+            bool validarDo = evaluacion;
+            int pos = posicion;
+            int lin = linea;
+            do
             {
-                BloqueInstrucciones(validarDo);
-            }
-            else
-            {
-                Instruccion(validarDo);
-            } 
-            match("while");
-            match("(");
-            //Requerimiento 4
-            validarDo = Condicion("");
-            if(!evaluacion)
-            {
-                validarDo = false;
-            }
-            match(")");
-            match(";");
+                if(getContenido() == "{")
+                {
+                    BloqueInstrucciones(validarDo, evaluaAsm);
+                }
+                else
+                {
+                    Instruccion(validarDo, evaluaAsm);
+                } 
+                match("while");
+                match("(");
+                string variable = getContenido();
+                if(!existeVariable(getContenido()))
+                    throw new Error("Error de sintaxis, variable inexistente <" +getContenido()+"> en linea: "+linea, log);
+                validarDo = Condicion("");
+                if(!evaluacion)
+                {
+                    validarDo = false;
+                }
+                match(")");
+                match(";");
+                if(validarDo)
+                {
+                    posicion = pos - variable.Length;
+                    linea = lin;
+                    setPosicion(posicion);
+                    NextToken();
+                }
+            }while(validarDo);
         }
 
         public void setPosicion(long posicion)
@@ -446,15 +469,17 @@ namespace SEMANTICA
         }
 
         //For -> for(Asignacion Condicion; Incremento) BloqueInstruccones | Intruccion 
-        private void For(bool evaluacion)
+        private void For(bool evaluacion, bool evaluaAsm)
         {
             string etiquetaInicioFor = "inicioFor" + cFor;
             string etiquetaFinFor = "finFor" + cFor++;
             asm.WriteLine(etiquetaInicioFor + ":");
             match("for");
             match("(");
-            Asignacion(evaluacion);
+            Asignacion(evaluacion, evaluaAsm);
             string variable = getContenido();
+            if(!existeVariable(getContenido()))
+                throw new Error("Error de sintaxis, variable inexistente <" +getContenido()+"> en linea: "+linea, log);
             bool validarFor;
             int pos = posicion;
             int lin = linea;
@@ -466,16 +491,17 @@ namespace SEMANTICA
                     validarFor = false;
                 }
                 match(";");
-                IncrementoFor(validarFor);
                 //Requerimiento 1.d
+                match(Tipos.Identificador);
+                float resultado = Incremento(variable);
                 match(")");
                 if(getContenido() == "{")
                 {
-                    BloqueInstrucciones(validarFor);  
+                    BloqueInstrucciones(validarFor, evaluaAsm);  
                 }
                 else
                 {
-                    Instruccion(validarFor);
+                    Instruccion(validarFor, evaluaAsm);
                 }
                 if(validarFor)
                 {
@@ -484,38 +510,62 @@ namespace SEMANTICA
                     setPosicion(posicion);
                     NextToken();
                 }
+                if(evaluacion)
+                {
+                    modVariable(variable, resultado);
+                }
             }while(validarFor);
             asm.WriteLine(etiquetaFinFor + ":");
         }
 
         //Incremento -> Identificador ++ | --
-        private void IncrementoFor(bool evaluacion)
+        private float Incremento(string nombre)
         {
-            string variable = getContenido();
-            Console.WriteLine(variable);
-            if(!existeVariable(getContenido()))
-                throw new Error("Error de sintaxis, variable inexistente <" +getContenido()+"> en linea: "+linea, log);
-            match(Tipos.Identificador);
-            if(getContenido() == "++")
+            float resultado = getValor(nombre);
+            switch(getContenido())
             {
-                match("++");
-                if(evaluacion)
-                {
-                    modVariable(variable, getValor(variable)+1);
-                }
+                case "++":
+                    match(Tipos.IncrementoTermino);
+                    resultado++;
+                    asm.WriteLine("Inc " + nombre);
+                    break;
+                case "--":
+                    match(Tipos.IncrementoTermino);
+                    asm.WriteLine("Dec " + nombre);
+                    resultado--;
+                    break;
+                case "+=":
+                    match(Tipos.IncrementoTermino);
+                    Expresion();
+                    resultado += stack.Pop();
+                    asm.WriteLine("Pop AX");
+                    break;
+                case "-=":
+                    match(Tipos.IncrementoTermino);
+                    Expresion();
+                    resultado -= stack.Pop();
+                    break;
+                case "*=":
+                    match(Tipos.IncrementoFactor);
+                    Expresion();
+                    resultado *= stack.Pop();
+                    break;
+                case "/=":
+                    match(Tipos.IncrementoFactor);
+                    Expresion();
+                    resultado /= stack.Pop();
+                    break;
+                case "%=":
+                    match(Tipos.IncrementoFactor);
+                    Expresion();
+                    resultado %= stack.Pop();
+                    break;
             }
-            else
-            {
-                match("--");
-                if(evaluacion)
-                {
-                    modVariable(variable, getValor(variable)-1);
-                }
-            }
+            return resultado;
         }
 
         //Switch -> switch (Expresion) {Lista de casos} | (default: )
-        private void Switch(bool evaluacion)
+        private void Switch(bool evaluacion, bool evaluaAsm)
         {
             match("switch");
             match("(");
@@ -524,32 +574,35 @@ namespace SEMANTICA
             asm.WriteLine("Pop AX");
             match(")");
             match("{");
-            ListaDeCasos(evaluacion);
+            ListaDeCasos(evaluacion, evaluaAsm);
             if(getContenido() == "default")
             {
                 match("default");
                 match(":");
                 if(getContenido() == "{")
                 {
-                    BloqueInstrucciones(evaluacion);  
+                    BloqueInstrucciones(evaluacion, evaluaAsm);   
                 }
                 else
                 {
-                    Instruccion(evaluacion);
+                    Instruccion(evaluacion, evaluaAsm);
                 }
             }
             match("}");
         }
 
         //ListaDeCasos -> case Expresion: listaInstruccionesCase (break;)? (ListaDeCasos)?
-        private void ListaDeCasos(bool evaluacion)
+        private void ListaDeCasos(bool evaluacion, bool evaluaAsm)
         {
             match("case");
             Expresion();
             stack.Pop();
-            asm.WriteLine("Pop AX");
+            if(evaluaAsm)
+            {
+                asm.WriteLine("Pop AX");
+            }
             match(":");
-            ListaInstruccionesCase(evaluacion);
+            ListaInstruccionesCase(evaluacion, evaluaAsm);
             if(getContenido() == "break")
             {
                 match("break");
@@ -557,7 +610,7 @@ namespace SEMANTICA
             }
             if(getContenido() == "case")
             {
-                ListaDeCasos(evaluacion);
+                ListaDeCasos(evaluacion, evaluaAsm);
             }
         }
 
@@ -596,9 +649,10 @@ namespace SEMANTICA
         }
 
         //If -> if(Condicion) bloque de instrucciones (else bloque de instrucciones)?
-        private void If(bool evaluacion)
+        private void If(bool evaluacion, bool evaluaAsm)
         {
             String etiquetaIf = "if" + ++cIf;
+            string finIf = "else" + cIf;
             match("if");
             match("(");
             bool validarIf = Condicion("");
@@ -609,11 +663,16 @@ namespace SEMANTICA
             match(")");
             if(getContenido() == "{")
             {
-                BloqueInstrucciones(validarIf);          
+                BloqueInstrucciones(validarIf, evaluaAsm);          
             }
             else
             {
-                Instruccion(validarIf);  
+                Instruccion(validarIf, evaluaAsm);  
+            }
+            if(evaluaAsm)
+            {
+                asm.WriteLine("JMP " + finIf);
+                asm.WriteLine(etiquetaIf + ":");  
             }
             if(getContenido() == "else")
             {
@@ -622,30 +681,30 @@ namespace SEMANTICA
                 {
                     if(evaluacion)
                     {
-                        BloqueInstrucciones(!validarIf);
+                        BloqueInstrucciones(!validarIf, evaluaAsm);
                     }
                     else
                     {
-                        BloqueInstrucciones(evaluacion);
+                        BloqueInstrucciones(evaluacion, evaluaAsm);
                     }
                 }
                 else
                 {
                     if(evaluacion)
                     {
-                        Instruccion(!validarIf);
+                        Instruccion(!validarIf, evaluaAsm);
                     }
                     else
                     {
-                        Instruccion(evaluacion);
+                        Instruccion(evaluacion, evaluaAsm);
                     }
                 }
             }
-            asm.WriteLine(etiquetaIf+":");
+            asm.WriteLine(finIf + ":");
         }
 
         //Printf -> printf(cadena o expresion);
-        private void Printf(bool evaluacion)
+        private void Printf(bool evaluacion, bool evaluaAsm)
         {
             match("printf");
             match("(");
@@ -666,14 +725,20 @@ namespace SEMANTICA
                         Console.Write(cadena[i]);
                     }
                 }
-                asm.WriteLine("PRINTN " + getContenido());
+                if(evaluaAsm)
+                {
+                    asm.WriteLine("PRINTN " + getContenido());
+                }
                 match(Tipos.Cadena);
             }
             else
             {
                 Expresion();
                 float resultado = stack.Pop();
-                asm.WriteLine("Pop AX");
+                if(evaluaAsm)
+                {
+                    asm.WriteLine("Pop AX");
+                }
                 if(evaluacion)
                 {
                     Console.Write(resultado);
@@ -684,7 +749,7 @@ namespace SEMANTICA
         }
 
         //Scanf -> scanf(cadena, &identificador);
-        private void Scanf(bool evaluacion)    
+        private void Scanf(bool evaluacion, bool evaluaAsm)    
         {
             match("scanf");
             match("(");
@@ -707,7 +772,11 @@ namespace SEMANTICA
                 float valorFloat = float.Parse(val);
                 modVariable(getContenido(), valorFloat);
             }         
-            asm.WriteLine("CALL SCAN_NUM");
+            if(evaluaAsm)
+            {
+                asm.WriteLine("CALL SCAN_NUM");
+                asm.WriteLine("MOV " + getContenido() + ", CX");
+            } 
             asm.WriteLine("MOV " + getContenido() + ", CX"); 
             match(Tipos.Identificador);
             match(")");
@@ -817,6 +886,8 @@ namespace SEMANTICA
                 }
                 stack.Push(getValor(getContenido()));
                 //Requerimiento 3.a
+                asm.WriteLine("Mov AX, " + getContenido());
+                asm.WriteLine("Push AX");
                 match(Tipos.Identificador);
             }
             else
@@ -852,6 +923,9 @@ namespace SEMANTICA
                     asm.WriteLine("Pop AX");
                     valor = convert(valor, dominante);
                     stack.Push(valor);
+                    //Requerimiento 3.a
+                    asm.WriteLine("Mov AX, " + valor);
+                    asm.WriteLine("Push AX");
                 }
             }
         }

@@ -16,7 +16,7 @@ using System.Collections.Generic;
 //Requerimiento 3:
 //                 a)Considerar las variables y los casteos de las expresiones matematicas en ensamblador 
 //                 b)Considerar el residuo de la division en assembler  <3    
-//                 c)Programar el printf y scanf en ensamblador
+//                 c)Programar el printf y scanf en ensamblador <3
 //Requerimiento 4: 
 //                 a) Programar el else en ensamblador
 //                 b) Programar el for en ensamblador

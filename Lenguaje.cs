@@ -2,19 +2,27 @@
 using System;
 using System.Collections.Generic;
 //Requerimiento 1: Actualizacion:
-//                 a)agregar el residuo de la division en porfactor
+//                 a)agregar el residuo de la division en porfactor <3
 //                 b)agregar en instruccion los incrementos de termino y los incrementos de factor
 //                   a++, a--, a+=1, a-=1, a*=1, a/=1, a%=1
 //                   en donde el uno puede ser una expresion
 //                 c)programar el destructor para ejecutar el metodo cerrarArchivo()
 //                  #libreria especial
 //Requerimiento 2:    
-//                 c)Marcar errores semanticos cuando los incrementos de termino o incrementos de factor
+//                 a)Marcar errores semanticos cuando los incrementos de termino o incrementos de factor
 //                   superen el rango de la variable
-//                 d)Considerar el inciso b y c para el for
-//                 e)Que funcione el do y el while
+//                 b)Considerar el inciso b y c para el for
+//                 c)Que funcione el do y el while
 //Requerimiento 3:
-//                 a)Considerar las variables y los casteos de las expresiones matematicas en ensamblador    
+//                 a)Considerar las variables y los casteos de las expresiones matematicas en ensamblador 
+//                 b)Considerar el residuo de la division en assembler  <3    
+//                 c)Programar el printf y scanf en ensamblador
+//Requerimiento 4: 
+//                 a) Programar el else en ensamblador
+//                 b) Programar el for en ensamblador
+//Requerimiento 5: 
+//                 a) Programar el do en ensamblador
+//                 b) Programar el do while en ensamblador
 
 namespace SEMANTICA
 {
@@ -26,11 +34,11 @@ namespace SEMANTICA
         int cIf;
         public Lenguaje()
         {
-
+            cIf = 0;
         }
         public Lenguaje(string nombre) : base(nombre)
         {
-
+            cIf = 0;
         }
 
         ~Lenguaje()
@@ -415,7 +423,7 @@ namespace SEMANTICA
                     validarFor = false;
                 }
                 match(";");
-                Incremento(validarFor);
+                IncrementoFor(validarFor);
                 //Requerimiento 1.d
                 match(")");
                 if(getContenido() == "{")
@@ -437,9 +445,10 @@ namespace SEMANTICA
         }
 
         //Incremento -> Identificador ++ | --
-        private void Incremento(bool evaluacion)
+        private void IncrementoFor(bool evaluacion)
         {
             string variable = getContenido();
+            Console.WriteLine(variable);
             if(!existeVariable(getContenido()))
                 throw new Error("Error de sintaxis, variable inexistente <" +getContenido()+"> en linea: "+linea, log);
             match(Tipos.Identificador);
@@ -548,7 +557,6 @@ namespace SEMANTICA
             String etiquetaIf = "if" + ++cIf;
             match("if");
             match("(");
-            //Requerimiento 4
             bool validarIf = Condicion("");
             if(!evaluacion)
             {
@@ -566,7 +574,6 @@ namespace SEMANTICA
             if(getContenido() == "else")
             {
                 match("else");
-                //Requerimiento 4 Se debe comportar alravez
                 if(getContenido() == "{")
                 {
                     if(evaluacion)
@@ -719,13 +726,18 @@ namespace SEMANTICA
                 {
                     case "*":
                         stack.Push(n2*n1);
-                        asm.WriteLine("MUL AX, BX");
+                        asm.WriteLine("MUL BX");
                         asm.WriteLine("Push AX");
                         break;
                     case "/":
                         stack.Push(n2/n1);
-                        asm.WriteLine("DIV AX, BX");
+                        asm.WriteLine("DIV BX");
                         asm.WriteLine("Push AX");
+                        break;
+                    case "%":
+                        stack.Push(n2%n1);
+                        asm.WriteLine("DIV BX");
+                        asm.WriteLine("Push DX");
                         break;
                 }
             }
